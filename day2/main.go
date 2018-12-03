@@ -2,104 +2,75 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
 	"strings"
+
+	"github.com/acburdine/adventofcode-2018"
 )
 
 func main() {
-	data, err := ioutil.ReadFile("./input.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
+	lines := mapRunes(adventofcode.Input())
 
-	lines := strings.Split(string(data), "\n")
-
-	answer1 := part1(lines)
-	fmt.Printf("Answer to part 1: %d\n", answer1)
-
-	answer2 := part2(lines)
-	fmt.Printf("Answer to part 2: %s\n", answer2)
+	fmt.Printf("Day 2 Part 1: %d\n", part1(lines))
+	fmt.Printf("Day 2 Part 2: %s\n", part2(lines))
 }
 
-func part1(lines []string) int {
-	twoCount := 0
-	threeCount := 0
+func mapRunes(lines []string) [][]rune {
+	result := make([][]rune, len(lines))
+	for i, l := range lines {
+		result[i] = []rune(strings.TrimSpace(l))
+	}
+	return result
+}
 
-	for _, l := range lines {
-		found := make(map[rune]int, len(l))
+func part1(lines [][]rune) int {
+	two := 0
+	three := 0
 
-		for _, char := range l {
-			if char == ' ' {
-				continue
-			}
+	for _, r := range lines {
+		found := make(map[rune]int, len(r))
 
-			v, ok := found[char]
-			if ok {
-				found[char] = v + 1
-			} else {
-				found[char] = 1
-			}
+		for _, char := range r {
+			found[char] = found[char] + 1
 		}
 
 		hasTwo := false
 		hasThree := false
 
 		for _, count := range found {
-			if count == 2 {
-				hasTwo = true
-			} else if count == 3 {
-				hasThree = true
-			}
+			hasTwo = (count == 2) || hasTwo
+			hasThree = (count == 3) || hasThree
 		}
-
 		if hasTwo {
-			twoCount++
+			two++
 		}
-
 		if hasThree {
-			threeCount ++
+			three++
 		}
 	}
-
-	return twoCount * threeCount
+	return two * three
 }
 
-func part2(lines []string) string {
+func part2(lines [][]rune) string {
 	for i := 0; i < len(lines); i++ {
-		for j := i; j < len(lines); j++ {
-			line1 := []rune(lines[i])
-			line2 := []rune(lines[j])
+		for j := i + 1; j < len(lines); j++ {
+			line1 := lines[i]
+			line2 := lines[j]
 
-			diffCount := 0
-			diffPos := 0
-
+			same := make([]rune, 0, len(line1))
 			for x, r1 := range line1 {
-				r2 := line2[x]
-
-				if r1 == r2 {
-					continue
-				}
-
-				diffPos = x
-				diffCount++
-				if diffCount > 1 {
-					break
+				if r1 == line2[x] {
+					same = append(same, r1)
 				}
 			}
 
-			if diffCount == 1 {
-				result := make([]rune, 0, len(line1))
-				for x, char := range line1 {
-					if x != diffPos {
-						result = append(result, char)
-					}
-				}
-				return string(result)
+			diff := len(line1) - len(same)
+			if diff > 1 {
+				continue
 			}
+
+			return string(same)
 		}
 	}
 
 	return ""
 }
-
