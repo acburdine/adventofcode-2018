@@ -2,77 +2,45 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
 	"strconv"
-	"strings"
+
+	"github.com/acburdine/adventofcode-2018"
 )
 
 func main() {
-	data, err := ioutil.ReadFile("./input.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
+	ints := mapInt(adventofcode.Input())
 
-	lines := strings.Split(string(data), "\n")
-
-	answer1, err := part1(lines)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("Answer to Part 1: %d\n", answer1)
-
-	answer2, err := part2(lines)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("Answer to Part 2: %d\n", answer2)
+	fmt.Printf("Day 1 Part 1: %d\n", part1(ints))
+	fmt.Printf("Day 1 Part 2: %d\n", part2(ints))
 }
 
-func part1(lines []string) (int, error) {
-	freq := 0
-
-	for _, l := range lines {
-		if l == "" {
-			continue
-		}
-
-		num, err := strconv.Atoi(l)
-		if err != nil {
-			return 0, err
-		}
-		freq += num
+func mapInt(arr []string) []int {
+	intarr := make([]int, len(arr))
+	for i, s := range arr {
+		num, _ := strconv.Atoi(s)
+		intarr[i] = num
 	}
-
-	return freq, nil
+	return intarr
 }
 
-func part2(lines []string) (int, error) {
-	freq := 0
-	i := 0
+func part1(ints []int) int {
+	sum := 0
+	for _, i := range ints {
+		sum += i
+	}
+	return sum
+}
+
+func part2(ints []int) int {
+	mark := 0
 	found := make(map[int]bool)
 
-	for {
-		l := lines[i]
-		if l == "" {
-			i = (i + 1) % len(lines)
-			continue
+	for i := 0; true; i = (i + 1) % len(ints) {
+		mark += ints[i]
+		if _, ok := found[mark]; ok {
+			return mark
 		}
-
-		num, err := strconv.Atoi(l)
-		if err != nil {
-			return 0, err
-		}
-		freq += num
-
-		if _, ok := found[freq]; ok {
-			return freq, nil
-		}
-
-		found[freq] = true
-		i = (i + 1) % len(lines)
+		found[mark] = true
 	}
+	return 0
 }
-
