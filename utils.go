@@ -9,7 +9,7 @@ import (
 const inputFile = "./input.txt"
 
 func Input() []string {
-	data, err := ioutil.ReadFile("./input.txt")
+	data, err := ioutil.ReadFile(inputFile)
 	if err != nil {
 		log.Fatal(err)
 	}
